@@ -164,7 +164,6 @@ const Home: NextPage = () => {
                     <Button
                       shape="circle"
                       icon={<CommentOutlined />}
-                      disabled={record.threads.length > 0}
                       onClick={() =>
                         setOpenCommentForm({
                           issueId: record.id,
