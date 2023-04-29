@@ -16,21 +16,32 @@ npm create t3-app@latest
 ```
 
 ```sh
-touch docker-compose.yml
-touch prisma/seed.js
-```
+npm init @eslint/config
 
-update `.env` and run,
+✔ How would you like to use ESLint? · problems
+✔ What type of modules does your project use? · esm
+✔ Which framework does your project use? · react
+✔ Does your project use TypeScript? · Yes
+✔ Where does your code run? · browser
+✔ What format do you want your config file to be in? · JavaScript
+✔ Would you like to install them now? · Yes
+✔ Which package manager do you want to use? · npm
+```
 
 ```sh
-npm run db:init
+npm install --save-dev prettier eslint-config-prettier
+echo {}> .prettierrc.json
 ```
 
+```sh
+touch docker-compose.yml
+touch prisma/seed.mjs
 
-## DB
+# update package.json for scripts
+# update .env about DATABASE_URL
 
-Updates `schema.prisma`.
-
+npm run db:init
+```
 
 ## What's next? How do I make an app with this?
 
