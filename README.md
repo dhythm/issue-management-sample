@@ -2,7 +2,9 @@
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-## Installation
+## Setting up
+
+### Create the app
 
 ```sh
 npm create t3-app@latest
@@ -14,6 +16,8 @@ npm create t3-app@latest
 ? Would you like us to run 'npm install'? Yes
 ? What import alias would you like configured? @
 ```
+
+### Install linter and formatter
 
 ```sh
 npm init @eslint/config
@@ -33,6 +37,8 @@ npm install --save-dev prettier eslint-config-prettier
 echo {}> .prettierrc.json
 ```
 
+### Create DB
+
 ```sh
 touch docker-compose.yml
 touch prisma/seed.mjs
@@ -41,6 +47,13 @@ touch prisma/seed.mjs
 # update .env about DATABASE_URL
 
 npm run db:init
+```
+
+### Implement the app
+
+```sh
+npm install antd
+npm install --save @ant-design/icons
 ```
 
 ## What's next? How do I make an app with this?
