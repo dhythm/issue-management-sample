@@ -78,6 +78,7 @@ const Home: NextPage = () => {
           <Layout.Content>
             <Table
               dataSource={data}
+              pagination={false}
               expandable={{
                 expandedRowRender: (record) => (
                   <Table
@@ -85,17 +86,21 @@ const Home: NextPage = () => {
                       id: thread.id,
                       title: thread.title,
                       resolved: thread.resolved,
+                      createdAt: thread.createdAt.toISOString(),
                       comments: thread.comments,
                       user: thread.user,
                     }))}
+                    pagination={false}
                     expandable={{
                       expandedRowRender: (record) => (
                         <Table
                           dataSource={record.comments.map((comment) => ({
                             id: comment.id,
                             content: comment.content,
+                            createdAt: comment.createdAt.toISOString(),
                             user: comment.user,
                           }))}
+                          pagination={false}
                         >
                           <Table.Column
                             title="Content"
@@ -110,6 +115,11 @@ const Home: NextPage = () => {
                                 {record.user.name}
                               </Typography.Text>
                             )}
+                          />
+                          <Table.Column
+                            title="CommentedAt"
+                            dataIndex="createdAt"
+                            key="createdAt"
                           />
                         </Table>
                       ),
@@ -127,6 +137,11 @@ const Home: NextPage = () => {
                       render={(_, record: Thread & { user: User }) => (
                         <Typography.Text>{record.user.name}</Typography.Text>
                       )}
+                    />
+                    <Table.Column
+                      title="CreatedAt"
+                      dataIndex="createdAt"
+                      key="createdAt"
                     />
                     <Table.Column
                       title="action"

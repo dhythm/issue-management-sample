@@ -24,6 +24,7 @@ model User {
   issuesAssigned Issue[]   @relation("assignee")
   threads        Thread[]
   comments       Comment[]
+  reviews        Review[]
 }
 
 model Issue {
@@ -38,7 +39,32 @@ model Issue {
   author     User     @relation("author", fields: [authorId], references: [id])
   assigneeId String?
   assignee   User?    @relation("assignee", fields: [assigneeId], references: [id])
+  reviews    Review[]
   threads    Thread[]
+}
+
+model Review {
+  id         String       @id @default(cuid())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  status     ReviewStatus
+  type       ReviewType
+  reviewerId String
+  reviewer   User         @relation(fields: [reviewerId], references: [id])
+  issueId    String
+  issue      Issue        @relation(fields: [issueId], references: [id])
+}
+
+enum ReviewStatus {
+  draft
+  reviewing
+  approved
+  rejected
+}
+
+enum ReviewType {
+  intermediate
+  final
 }
 
 model Thread {
