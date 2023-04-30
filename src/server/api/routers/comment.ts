@@ -25,6 +25,22 @@ export const commentRouter = createTRPCRouter({
         },
       });
     }),
+  resolveThread: publicProcedure
+    .input(
+      z.object({
+        id: z.string().cuid(),
+      })
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.thread.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          resolved: true,
+        },
+      });
+    }),
   createComment: publicProcedure
     .input(
       z.object({

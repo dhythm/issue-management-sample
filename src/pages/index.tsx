@@ -1,32 +1,29 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { api } from "@/utils/api";
-import {
-  Button,
-  Form,
-  Input,
-  Layout,
-  Modal,
-  Select,
-  Space,
-  Table,
-  Typography,
-} from "antd";
+import { Button, Layout, Modal, Space, Table, Tag, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import {
+  CheckCircleOutlined,
+  CheckCircleTwoTone,
+  CheckOutlined,
   CommentOutlined,
   MoreOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { CommentForm, IssueForm } from "@/components";
-import { Thread, User } from "@prisma/client";
+import { Review, Thread, User } from "@prisma/client";
 
 type DataType = {
   id: string;
   key: string;
   title: string;
-  threads: (Thread & { comments: (Comment & User)[]; user: User })[];
+  threads: (Thread & {
+    comments: (Comment & { user: User })[];
+    user: User;
+  })[];
+  reviews: (Review & { reviewer: User })[];
   createdAt: string;
 };
 
@@ -45,6 +42,7 @@ const Home: NextPage = () => {
   const issues = api.issue.getIssues.useQuery();
   const createIssueMutation = api.issue.createIssue.useMutation();
   const createThreadMutation = api.comment.createThread.useMutation();
+  const resolveThreadMutation = api.comment.resolveThread.useMutation();
   const createCommentMutation = api.comment.createComment.useMutation();
 
   const data = issues.data?.map((issue) => ({
@@ -52,6 +50,7 @@ const Home: NextPage = () => {
     key: issue.key,
     title: issue.title,
     threads: issue.threads,
+    reviews: issue.reviews,
     createdAt: issue.createdAt.toISOString(),
   }));
 
@@ -128,8 +127,12 @@ const Home: NextPage = () => {
                     <Table.Column title="title" dataIndex="title" key="title" />
                     <Table.Column
                       title="resolved"
-                      dataIndex="resolved"
                       key="resolved"
+                      render={(_, { resolved }: Thread & { user: User }) =>
+                        resolved ? (
+                          <CheckCircleTwoTone twoToneColor="#52c41a" />
+                        ) : null
+                      }
                     />
                     <Table.Column
                       title="Author"
@@ -147,17 +150,30 @@ const Home: NextPage = () => {
                       title="action"
                       key="action"
                       render={(_, record: Thread) => (
-                        <Button
-                          shape="circle"
-                          icon={<CommentOutlined />}
-                          onClick={() =>
-                            setOpenCommentForm({
-                              issueId: "",
-                              threadId: record.id,
-                              open: true,
-                            })
-                          }
-                        />
+                        <Space size="middle">
+                          <Button
+                            shape="circle"
+                            icon={<CommentOutlined />}
+                            onClick={() =>
+                              setOpenCommentForm({
+                                issueId: "",
+                                threadId: record.id,
+                                open: true,
+                              })
+                            }
+                          />
+                          <Button
+                            shape="circle"
+                            icon={<CheckOutlined />}
+                            disabled={record.resolved}
+                            onClick={async () => {
+                              await resolveThreadMutation.mutateAsync({
+                                id: record.id,
+                              });
+                              issues.refetch();
+                            }}
+                          />
+                        </Space>
                       )}
                     />
                   </Table>
@@ -171,6 +187,23 @@ const Home: NextPage = () => {
                   key={column.key}
                 />
               ))}
+              <Table.Column
+                title="Reviewers"
+                key="reviewers"
+                render={(_, record: DataType) => (
+                  <>
+                    {record.reviews.map((review) => {
+                      const color =
+                        review.type === "intermediate" ? "geekblue" : "green";
+                      return (
+                        <Tag color={color} key={review.id}>
+                          {review.reviewer.name}
+                        </Tag>
+                      );
+                    })}
+                  </>
+                )}
+              />
               <Table.Column
                 title="Action"
                 key="action"

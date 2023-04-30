@@ -5,14 +5,19 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "@/server/api/trpc";
+import { ReviewStatus, ReviewType } from "@prisma/client";
 
 export const issueRouter = createTRPCRouter({
   getIssues: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.issue.findMany({
       include: {
         threads: {
-          include: { comments: { include: { user: true } }, user: true },
+          include: {
+            comments: { include: { user: true } },
+            user: true,
+          },
         },
+        reviews: { include: { reviewer: true } },
       },
     });
   }),
@@ -29,6 +34,8 @@ export const issueRouter = createTRPCRouter({
         content: z.string(),
         authorId: z.string().cuid(),
         assigneeId: z.string().cuid(),
+        reviewerIds: z.string().cuid().array(),
+        approverIds: z.string().cuid().array(),
       })
     )
     .mutation(({ input, ctx }) => {
@@ -40,6 +47,23 @@ export const issueRouter = createTRPCRouter({
           content: input.content,
           authorId: input.authorId,
           assigneeId: input.assigneeId,
+          reviews: {
+            createMany: {
+              data: input.reviewerIds
+                .map((id) => ({
+                  status: "draft" as const satisfies ReviewStatus,
+                  type: "intermediate" as ReviewType,
+                  reviewerId: id,
+                }))
+                .concat(
+                  input.approverIds.flatMap((id) => ({
+                    status: "draft" as const satisfies ReviewStatus,
+                    type: "final" as ReviewType,
+                    reviewerId: id,
+                  }))
+                ),
+            },
+          },
         },
       });
     }),

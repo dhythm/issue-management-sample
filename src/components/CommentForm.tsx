@@ -2,8 +2,13 @@ import { FC } from "react";
 import { Form, Select, Input, Button } from "antd";
 import { api } from "@/utils/api";
 
+type Values = {
+  userId: string;
+  content: string;
+};
+
 type Props = {
-  onSubmit: (values: any) => void;
+  onSubmit: (values: Values) => void;
 };
 
 export const CommentForm: FC<Props> = ({ onSubmit }) => {

@@ -2,8 +2,18 @@ import { FC } from "react";
 import { Form, Select, Input, Button } from "antd";
 import { api } from "@/utils/api";
 
+type Values = {
+  authorId: string;
+  assigneeId: string;
+  reviewerIds: string[];
+  approverIds: string[];
+  key: string;
+  title: string;
+  content: string;
+};
+
 type Props = {
-  onSubmit: (values: any) => void;
+  onSubmit: (values: Values) => void;
 };
 
 export const IssueForm: FC<Props> = ({ onSubmit }) => {
@@ -36,6 +46,20 @@ export const IssueForm: FC<Props> = ({ onSubmit }) => {
         rules={[{ required: true }]}
       >
         <Select options={userOptions} />
+      </Form.Item>
+      <Form.Item
+        label="Reviewers"
+        name="reviewerIds"
+        rules={[{ required: true }]}
+      >
+        <Select mode="multiple" options={userOptions} />
+      </Form.Item>
+      <Form.Item
+        label="Approvers"
+        name="approverIds"
+        rules={[{ required: true }]}
+      >
+        <Select mode="multiple" options={userOptions} />
       </Form.Item>
       <Form.Item label="Key" name="key" rules={[{ required: true }]}>
         <Select
